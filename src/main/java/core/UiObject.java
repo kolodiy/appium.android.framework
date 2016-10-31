@@ -14,6 +14,7 @@ public class UiObject {
 
     UiObject(String locator){
         this.locator = locator;
+        MyLogger.log.debug("Created new UiObject: "+this.locator);
     }
 
     private boolean isXpath(){
@@ -26,8 +27,7 @@ public class UiObject {
             if(isXpath()) element= Android.driver.findElementByXPath(locator);
             else element= Android.driver.findElementByAndroidUIAutomator(locator);
             return  element.isDisplayed();
-        }
-        catch (NoSuchElementException e){
+        } catch (NoSuchElementException e){
             return false;
         }
     }
@@ -99,7 +99,7 @@ public class UiObject {
             WebElement element;
             if(isXpath()) element= Android.driver.findElementByXPath(locator);
             else element= Android.driver.findElementByAndroidUIAutomator(locator);
-            return  element.getText();
+            return  element.getAttribute("text");
     }
 
     public String getResourceId(){
@@ -138,6 +138,34 @@ public class UiObject {
     public UiObject tap(){
         if(isXpath()) Android.driver.findElementByXPath(locator).click();
         else Android.driver.findElementByAndroidUIAutomator(locator).click();
+        return this;
+    }
+
+/*    public UiObject scrollTo(){
+        if (!locator.contains("text")) throw new RuntimeException("Scroll to method can be used only to text attributes: "+locator+" does not contain text attribute ");
+        if(isXpath()) Android.driver.scrollTo(locator.substring(locator.indexOf("@text=\""), locator.indexOf("\"]")).replace("@text=\"",""));
+        else {
+            String text;
+            if(locator.contains("textContains")) text = locator.substring(locator.indexOf(".textContains(\""), locator.indexOf("\")")).replace(".textContains(\"", "");
+            else text = locator.substring(locator.indexOf(".text(\""), locator.indexOf("\")")).replace(".textContains(\"", "");
+            Android.driver.scrollTo(text);
+        }
+        return this;
+    }*/
+
+    public UiObject waitToAppear(int seconds){
+        Timer timer = new Timer();
+        timer.startTimer();
+        while(!timer.expired(seconds)) if(exists()) break;
+        if(timer.expired(seconds) && !exists()) throw new AssertionError("Element "+locator+" failed to appear within "+seconds+" seconds");
+        return this;
+    }
+
+    public UiObject waitToDisappear(int seconds){
+        Timer timer = new Timer();
+        timer.startTimer();
+        while(!timer.expired(seconds)) if(!exists()) break;
+        if(timer.expired(seconds) && exists()) throw new AssertionError("Element "+locator+" failed to disappear within "+seconds+" seconds");
         return this;
     }
 
