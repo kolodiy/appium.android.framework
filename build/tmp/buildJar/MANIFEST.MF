@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implemetation-Title: Appium Framework
+Implemetation-Version: 1.0-SNAPSHOT
+Main-Class: Runner
+
